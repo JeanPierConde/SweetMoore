@@ -1,8 +1,10 @@
 <?php
 require_once "../modelo/ArticuloModelo.php";
 require_once "../repositorio/ArticuloRepository.php";
+require_once "../config/util.php";
 
 $articulo = new Articulo();
+$util = new Util();
 
 $idarticulo = isset($_POST["idarticulo"]) ? limpiarCadena($_POST["idarticulo"]) : "";
 $idcategoria = isset($_POST["idcategoria"]) ? limpiarCadena($_POST["idcategoria"]) : "";
@@ -12,6 +14,11 @@ $stock = isset($_POST["stock"]) ? limpiarCadena($_POST["stock"]) : "";
 $descripcion = isset($_POST["descripcion"]) ? limpiarCadena($_POST["descripcion"]) : "";
 $imagen = isset($_POST["imagen"]) ? limpiarCadena($_POST["imagen"]) : "";
 
+$idarticulo = $util->xss_clean($idarticulo);
+$idcategoria = $util->xss_clean($idcategoria);
+$codigo = $util->xss_clean($codigo);
+$nombre = $util->xss_clean($nombre);
+$descripcion = $util->xss_clean($descripcion);
 
 $objarticulomodelo = new ArticuloModelo();
 
@@ -99,5 +106,10 @@ switch ($_GET["op"]) {
 		while ($reg = $rspta->fetch_object()) {
 			echo '<option value=' . $reg->idcategoria . '>' . $reg->nombre . '</option>';
 		}
+		break;
+	case 'aleatoriocodigo':
+		$caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+		$longitud = 6;
+		echo substr(str_shuffle($caracteres), 0, $longitud);
 		break;
 }
