@@ -4,10 +4,12 @@ require_once "../modelo/UsuarioModelo.php";
 require_once "../repositorio/UsuarioRepository.php";
 require_once "../repositorio/UsuarioPermisoRepository.php";
 require_once "../config/util.php";
+require_once "../modelo/MessageResponse.php";
 
 $usuario = new Usuario();
 $usuarioPermiso = new UsuarioPermisoRepository();
 $util = new Util();
+$messageResponse = new MessageResponse();
 
 $idusuario = isset($_POST["idusuario"]) ? limpiarCadena($_POST["idusuario"]) : "";
 $nombre = isset($_POST["nombre"]) ? limpiarCadena($_POST["nombre"]) : "";
@@ -20,6 +22,17 @@ $cargo = isset($_POST["cargo"]) ? limpiarCadena($_POST["cargo"]) : "";
 $login = isset($_POST["login"]) ? limpiarCadena($_POST["login"]) : "";
 $clave = isset($_POST["clave"]) ? limpiarCadena($_POST["clave"]) : "";
 $imagen = isset($_POST["imagen"]) ? limpiarCadena($_POST["imagen"]) : "";
+
+$idusuario = $util->xss_clean($idusuario);
+$nombre = $util->xss_clean($nombre);
+$tipo_documento = $util->xss_clean($tipo_documento);
+$num_documento = $util->xss_clean($num_documento);
+$direccion = $util->xss_clean($direccion);
+$telefono = $util->xss_clean($telefono);
+$email = $util->xss_clean($email);
+$cargo = $util->xss_clean($cargo);
+$login = $util->xss_clean($login);
+
 
 $objusuariomodelo = new UsuarioModelo();
 
@@ -140,6 +153,9 @@ switch ($_GET["op"]) {
 		$logina = $_POST['logina'];
 		$clavea = $_POST['clavea'];
 
+		$logina = $util->xss_clean($logina);
+		$clavea = $util->xss_clean($clavea);
+
 		//Hash SHA256 en la contraseña
 		// $clavehash = hash("SHA256", $clavea);
 
@@ -149,11 +165,21 @@ switch ($_GET["op"]) {
 		$objusuariomodelo->setClave($util->encrypt_decrypt('encrypt', $clavea));
 		$objusuariomodelo->setIp($util->getRealIP());
 
-		$rspta = $usuario->ValidarUsuario($objusuariomodelo);
+		/*Output Login*/
+		$code = "";
+		$message = "";
 
-		$fetch = $rspta->fetch_object();
-		
-		if (isset($fetch)) {
+		$rspta = $usuario->ValidarUsuario($objusuariomodelo, $code, $message);
+
+
+		/*Data Response SP*/
+		$messageResponse->setCode($code); 
+		$messageResponse->setMessage($message); 
+
+		if(isset($rspta) && is_bool($rspta) === false){
+
+			$fetch = $rspta->fetch_object();
+			if (isset($fetch)) {
 
 				# Declaramos la variables de sesion
 				$_SESSION['idusuario'] = $fetch->idusuario;
@@ -162,6 +188,8 @@ switch ($_GET["op"]) {
 				$_SESSION['login'] = $fetch->login;
 				$_SESSION['email'] = $fetch->email;
 	
+				$_SESSION["login_time_stamp"] = time(); //add session
+
 				//obtenemos los permisos
 				$marcados = $usuarioPermiso->ListarPermisos($fetch->idusuario);
 	
@@ -182,9 +210,11 @@ switch ($_GET["op"]) {
 				in_array(6, $valores) ? $_SESSION['consultac'] = 1 : $_SESSION['consultac'] = 0;
 				in_array(7, $valores) ? $_SESSION['consultav'] = 1 : $_SESSION['consultav'] = 0;
 			}
-			
-		echo json_encode($fetch);
 
+
+		}
+
+		echo json_encode($messageResponse);
 
 		break;
 	case 'salir':
