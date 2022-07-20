@@ -1,8 +1,10 @@
 <?php
 require_once "../modelo/PersonaModelo.php";
 require_once "../repositorio/PersonaRepository.php";
+require_once "../config/util.php";
 
 $persona = new Persona();
+$util = new Util();
 
 $idpersona = isset($_POST["idpersona"]) ? limpiarCadena($_POST["idpersona"]) : "";
 $tipo_persona = isset($_POST["tipo_persona"]) ? limpiarCadena($_POST["tipo_persona"]) : "";
@@ -12,6 +14,15 @@ $num_documento = isset($_POST["num_documento"]) ? limpiarCadena($_POST["num_docu
 $direccion = isset($_POST["direccion"]) ? limpiarCadena($_POST["direccion"]) : "";
 $telefono = isset($_POST["telefono"]) ? limpiarCadena($_POST["telefono"]) : "";
 $email = isset($_POST["email"]) ? limpiarCadena($_POST["email"]) : "";
+
+$idpersona = $util->xss_clean($idpersona);
+$tipo_persona = $util->xss_clean($tipo_persona);
+$nombre = $util->xss_clean($nombre);
+$tipo_documento = $util->xss_clean($tipo_documento);
+$num_documento = $util->xss_clean($num_documento);
+$direccion = $util->xss_clean($direccion);
+$telefono = $util->xss_clean($telefono);
+$email = $util->xss_clean($email);
 
 $objpersonamodelo = new PersonaModelo();
 
