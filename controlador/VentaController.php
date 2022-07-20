@@ -1,10 +1,13 @@
 <?php
 require_once "../modelo/VentaModelo.php";
 require_once "../repositorio/VentaRepository.php";
+require_once "../config/util.php";
+
 if (strlen(session_id()) < 1)
 	session_start();
 
 $venta = new Venta();
+$util = new Util();
 
 $idventa = isset($_POST["idventa"]) ? limpiarCadena($_POST["idventa"]) : "";
 $idcliente = isset($_POST["idcliente"]) ? limpiarCadena($_POST["idcliente"]) : "";
@@ -16,12 +19,19 @@ $fecha_hora = isset($_POST["fecha_hora"]) ? limpiarCadena($_POST["fecha_hora"]) 
 $impuesto = isset($_POST["impuesto"]) ? limpiarCadena($_POST["impuesto"]) : "";
 $total_venta = isset($_POST["total_venta"]) ? limpiarCadena($_POST["total_venta"]) : "";
 
+$idventa = $util->xss_clean($idventa);
+$idcliente = $util->xss_clean($idcliente);
+$idusuario = $util->xss_clean($idusuario);
+$tipo_comprobante = $util->xss_clean($tipo_comprobante);
+$serie_comprobante = $util->xss_clean($serie_comprobante);
+$num_comprobante = $util->xss_clean($num_comprobante);
+
 $objventamodelo = new VentaModelo();
 
 switch ($_GET["op"]) {
 	case 'guardaryeditar':
             
-            	$objventamodelo->setIdventa($idventa);
+        $objventamodelo->setIdventa($idventa);
 		$objventamodelo->setIdcliente($idcliente);
 		$objventamodelo->setIdusuario($idusuario);
 		$objventamodelo->setTipo_comprobante($tipo_comprobante);
