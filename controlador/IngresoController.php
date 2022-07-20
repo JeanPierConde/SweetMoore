@@ -1,11 +1,13 @@
 <?php
 require_once "../modelo/IngresoModelo.php";
 require_once "../repositorio/IngresoRepository.php";
+require_once "../config/util.php";
 
 if (strlen(session_id()) < 1)
 	session_start();
 
 $ingreso = new Ingreso();
+$util = new Util();
 
 $idingreso = isset($_POST["idingreso"]) ? limpiarCadena($_POST["idingreso"]) : "";
 $idproveedor = isset($_POST["idproveedor"]) ? limpiarCadena($_POST["idproveedor"]) : "";
@@ -16,6 +18,13 @@ $num_comprobante = isset($_POST["num_comprobante"]) ? limpiarCadena($_POST["num_
 $fecha_hora = isset($_POST["fecha_hora"]) ? limpiarCadena($_POST["fecha_hora"]) : "";
 $impuesto = isset($_POST["impuesto"]) ? limpiarCadena($_POST["impuesto"]) : "";
 $total_compra = isset($_POST["total_compra"]) ? limpiarCadena($_POST["total_compra"]) : "";
+
+$idingreso = $util->xss_clean($idingreso);
+$idproveedor = $util->xss_clean($idproveedor);
+$idusuario = $util->xss_clean($idusuario);
+$tipo_comprobante = $util->xss_clean($tipo_comprobante);
+$serie_comprobante = $util->xss_clean($serie_comprobante);
+$num_comprobante = $util->xss_clean($num_comprobante);
 
 $objingresomodelo = new IngresoModelo();
 
