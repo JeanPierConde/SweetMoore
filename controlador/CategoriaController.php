@@ -1,17 +1,28 @@
 <?php
 require_once "../modelo/CategoriaModelo.php";
 require_once "../repositorio/CategoriaRepository.php";
+require_once "../config/util.php";
 
 $categoria = new Categoria();
+$util = new Util();
 
 $idcategoria = isset($_POST["idcategoria"]) ? limpiarCadena($_POST["idcategoria"]) : "";
 $nombre = isset($_POST["nombre"]) ? limpiarCadena($_POST["nombre"]) : "";
 $descripcion = isset($_POST["descripcion"]) ? limpiarCadena($_POST["descripcion"]) : "";
 
+$idcategoria = $util->xss_clean($idcategoria);
+$nombre = $util->xss_clean($nombre);
+$descripcion = $util->xss_clean($descripcion);
+
 $objcategoriamodelo = new CategoriaModelo();
 
 switch ($_GET["op"]) {
 	case 'guardaryeditar':
+
+		$idcategoria = $util->xss_clean($idcategoria);
+		$nombre = $util->xss_clean($nombre);
+		$descripcion = $util->xss_clean($descripcion);
+
 
 		$objcategoriamodelo->setIdcategoria($idcategoria);
 		$objcategoriamodelo->setNombre($nombre);
@@ -52,7 +63,7 @@ switch ($_GET["op"]) {
 			$data[] = array(
 				"0" => ($reg->condicion) ? '<button class="btn btn-warning btn-xs" onclick="mostrar(' . $reg->idcategoria . ')"><i class="fa fa-pencil"></i></button>' . ' ' . '<button class="btn btn-danger btn-xs" onclick="desactivar(' . $reg->idcategoria . ')"><i class="fa fa-close"></i></button>' : '<button class="btn btn-warning btn-xs" onclick="mostrar(' . $reg->idcategoria . ')"><i class="fa fa-pencil"></i></button>' . ' ' . '<button class="btn btn-primary btn-xs" onclick="activar(' . $reg->idcategoria . ')"><i class="fa fa-check"></i></button>',
 				"1" => $reg->nombre,
-				"2" => $reg->descripcion,
+				"2" => $util->xss_clean($reg->descripcion),
 				"3" => ($reg->condicion) ? '<span class="label bg-green">Activado</span>' : '<span class="label bg-red">Desactivado</span>'
 			);
 		}
